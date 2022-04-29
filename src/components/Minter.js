@@ -86,7 +86,7 @@ const Minter = ({ user, executeFunction }) => {
       // console.log(options.params);
       console.log(String("https://ipfs.infura.io/ipfs/" + String(added.path)));
       const receipt = tokenContract.methods
-        .mint(
+        .safeMint(
           String(user.attributes.ethAddress),
           String("https://ipfs.infura.io/ipfs/" + String(added.path))
         )
