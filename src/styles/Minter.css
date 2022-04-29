@@ -1,0 +1,28 @@
+.mint-form{
+    padding: 10%; 
+}
+
+.mint-card {
+        /* background: linear-gradient(
+         -131deg,
+         rgba(126, 189, 218, 1) 0%,
+         rgba(146, 221, 234, 1) 22%,
+         rgba(255, 165, 216, 1) 35%,
+         rgba(190, 157, 223, 1) 67%,
+         rgba(149, 121, 209, 1) 100%
+       ); */
+       background-color: white;
+       border-radius: 5%;
+}
+
+.mint-form-heading {
+        background: -webkit-linear-gradient(
+         41deg,
+         rgba(220, 31, 255, 1) 0%,
+         rgba(3, 225, 255, 1) 50%,
+         rgba(0, 255, 163, 1) 65%,
+         rgba(255, 165, 216, 1) 100%
+       );
+       -webkit-background-clip: text;
+       -webkit-text-fill-color: transparent;
+}

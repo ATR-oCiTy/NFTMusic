@@ -1,23 +1,55 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from './pages/Home'
+import MintPage from "./pages/MintPage";
+import "./styles/globals.css";
+import { useMoralis } from "react-moralis";
+import { Button, Card } from "@mui/material";
 
 function App() {
+  const {
+    authenticate,
+    isAuthenticated,
+    isAuthenticating,
+    user,
+    // account,
+    logout,
+  } = useMoralis();
+
+  const login = async () => {
+    if (!isAuthenticated) {
+      await authenticate({ signingMessage: "Log in using Moralis" })
+        .then(function (user) {
+          console.log("logged in user:", user);
+          console.log(user.attributes.ethAddress);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
+  };
+
+  const logOut = async () => {
+    await logout();
+    console.log("logged out");
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Card>
+        <Button onClick={login}>Moralis Metamask Login</Button>
+        <Button onClick={logOut} disabled={isAuthenticating}>
+          Logout
+        </Button>
+      </Card>
+      <div style={{ display: isAuthenticated ? "" : "none" }}>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Home />}></Route>
+            <Route path="/mint" element={<MintPage user={user} />}></Route>
+          </Routes>
+        </BrowserRouter>
+      </div>
     </div>
   );
 }

@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+html,
+body {
+    background: linear-gradient(
+        41deg,
+        rgba(126, 189, 218, 1) 0%,
+        rgba(146, 221, 234, 1) 22%,
+        rgba(255, 165, 216, 1) 35%,
+        rgba(190, 157, 223, 1) 67%,
+        rgba(149, 121, 209, 1) 100%
+        /* rgba(255, 154, 162, 1) 0%,
+        rgba(255, 183, 178, 1) 22%,
+        rgba(255, 218, 193, 1) 35%,
+        rgba(226, 240, 203, 1) 47%,
+        rgba(181, 234, 215, 1) 60%,
+        rgba(199, 206, 234, 1) 100% */
+      );
+    padding: 0;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+* {
+    box-sizing: border-box;
+}

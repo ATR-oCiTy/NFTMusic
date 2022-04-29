@@ -1,0 +1,10 @@
+.mint-main {
+    min-height: 100vh;
+    width: 100%;
+    padding: 4rem 0;
+    display: flex;
+    background-color: inherit;
+    /* flex-direction: column; */
+    justify-content: flex-start;
+    align-items: center;
+}
