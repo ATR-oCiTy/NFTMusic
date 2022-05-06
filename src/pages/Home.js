@@ -5,11 +5,13 @@ import "../styles/Home.css";
 import { Grid } from "@mui/material";
 
 import { Button } from "@mui/material";
+import { useState } from "react";
 
 const Home = () => {
   // const loadMusicList = () => {
   //   fetchAllTokenIds();
   // }
+  const [musicURL, setMusicURL] = useState('');
 
   return (
     <div className="home-container">
@@ -24,12 +26,12 @@ const Home = () => {
             <h1 style={{color:"white"}}> Welcome back, Ashley! </h1>
           </Grid>
           <Grid item xs={12}>
-            <MusicCard />
+            <MusicCard setMusicURL={setMusicURL} />
           </Grid>
           <div></div>
         </Grid>
       </div>
-      <PlayBar />
+      <PlayBar musicURL={musicURL}/>
       <style jsx>
         {`
           .main {

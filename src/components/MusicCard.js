@@ -14,7 +14,7 @@ import { MoralisContext, MoralisProvider } from "react-moralis";
 import { contractAddress } from "../ABI_Contract";
 import axios from "axios";
 
-const MusicCard = () => {
+const MusicCard = ({setMusicURL}) => {
   const Web3Api = useMoralisWeb3Api();
   var NFTs = [];
   const [NFTList, setNFTList] = useState([]);
@@ -33,7 +33,7 @@ const MusicCard = () => {
     setMusicList([]);
     NFTList.forEach((item, index) => {
       if (item.metadata!=null) {
-        console.log(JSON.parse(item.metadata));
+        console.log(JSON.parse(item.metadata, ));
         setMusicList(musicList => [...musicList, JSON.parse(item.metadata)]);
         console.log(musicList);
       }
@@ -49,10 +49,11 @@ const MusicCard = () => {
     <div style={{height:"100%"}}>
       <ImageList variant="standard" cols={7} gap={100} style={{height:"100%"}}>
         {musicList.map((item) => (
-          <Link href={item.audioUrl} target="_blank" key={item.title}>
+          // <Link href={item.audioUrl} target="_blank" key={item.title}>
           <ImageListItem
             onClick={() => {
               console.log("clicked");
+              setMusicURL(item.audioUrl);
             }}
             key={item.title}
             style={{ width: "10vw", height:"10vw", cursor: "pointer", overflow: "hidden" }}
@@ -73,7 +74,7 @@ const MusicCard = () => {
               }
             />
           </ImageListItem>
-          </Link>
+          // </Link>
         ))}
       </ImageList>
       <Button variant="contained" onClick={fetchAllTokenIds}>
