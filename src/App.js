@@ -2,6 +2,7 @@ import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from './pages/Home'
 import MintPage from "./pages/MintPage";
+import DetailsPage from "./pages/DetailsPage"
 import "./styles/globals.css";
 import { useMoralis } from "react-moralis";
 import { Button, Card } from "@mui/material";
@@ -47,6 +48,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />}></Route>
             <Route path="/mint" element={<MintPage user={user} />}></Route>
+            <Route path="/nft" element={<DetailsPage />}></Route>
           </Routes>
         </BrowserRouter>
       </div>

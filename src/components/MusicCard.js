@@ -47,7 +47,7 @@ const MusicCard = ({setMusicURL}) => {
 
   return (
     <div style={{height:"100%"}}>
-      <ImageList variant="standard" cols={7} gap={100} style={{height:"100%"}}>
+      <ImageList variant="standard" cols={6} gap={100} style={{ paddingTop:"5%", height:"90%", width:"90vw"}}>
         {musicList.map((item) => (
           // <Link href={item.audioUrl} target="_blank" key={item.title}>
           <ImageListItem

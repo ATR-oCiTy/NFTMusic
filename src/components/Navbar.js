@@ -23,13 +23,15 @@ export default function Navbar() {
             height={40}
           />
         </div>
-        <div className="nav-icon">
+        <div className="nav-icon" style={{ cursor: "pointer" }}>
+          <Link href="/nft">
           <img
             src="/profile.svg"
             alt="Picture of the author"
             width={40}
             height={40}
           />
+          </Link>
         </div>
         <div className="nav-icon" style={{ cursor: "pointer" }}>
           <Link href="/mint">
