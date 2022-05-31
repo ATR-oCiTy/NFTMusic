@@ -1,8 +1,12 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from './pages/Home'
+import Home from "./pages/Home";
 import MintPage from "./pages/MintPage";
+<<<<<<< HEAD
 import DetailsPage from "./pages/DetailsPage"
+=======
+import YourNFT from "./pages/YourNFT";
+>>>>>>> 05ffef1... feat(profile-page): Added profile page
 import "./styles/globals.css";
 import { useMoralis } from "react-moralis";
 import { Button, Card } from "@mui/material";
@@ -36,7 +40,7 @@ function App() {
   };
 
   return (
-    <div className="App">
+    <div className='App'>
       <Card>
         <Button onClick={login}>Moralis Metamask Login</Button>
         <Button onClick={logOut} disabled={isAuthenticating}>
@@ -49,6 +53,7 @@ function App() {
             <Route path="/" element={<Home />}></Route>
             <Route path="/mint" element={<MintPage user={user} />}></Route>
             <Route path="/nft" element={<DetailsPage />}></Route>
+            <Route path='/yourNFT' element={<YourNFT />}></Route>
           </Routes>
         </BrowserRouter>
       </div>
