@@ -50,7 +50,7 @@ function App() {
             <Route path='/' element={<Home />}></Route>
             <Route path='/mint' element={<MintPage user={user} />}></Route>
             <Route path='/nft' element={<DetailsPage />}></Route>
-            <Route path='/yourNFT' element={<YourNFT />}></Route>
+            <Route path='/user' element={<YourNFT />}></Route>
           </Routes>
         </BrowserRouter>
       </div>

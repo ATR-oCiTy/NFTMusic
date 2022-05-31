@@ -14,7 +14,7 @@ import { MoralisContext, MoralisProvider } from "react-moralis";
 import { contractAddress } from "../ABI_Contract";
 import axios from "axios";
 
-const MusicCard = ({setMusicURL}) => {
+const MusicCard = ({ setMusicURL }) => {
   const Web3Api = useMoralisWeb3Api();
   var NFTs = [];
   const [NFTList, setNFTList] = useState([]);
@@ -32,10 +32,15 @@ const MusicCard = ({setMusicURL}) => {
   const parseNFTs = async () => {
     setMusicList([]);
     NFTList.forEach((item, index) => {
-      if (item.metadata!=null) {
-        console.log(JSON.parse(item.metadata, ));
-        setMusicList(musicList => [...musicList, JSON.parse(item.metadata)]);
-        console.log(musicList);
+      if (item.metadata != null) {
+        console.log(JSON.parse(item.metadata));
+        if (!musicList.includes(JSON.parse(item.metadata))) {
+          setMusicList((musicList) => [
+            ...musicList,
+            JSON.parse(item.metadata),
+          ]);
+        }
+        // console.log(musicList);
       }
     });
   };
@@ -46,8 +51,13 @@ const MusicCard = ({setMusicURL}) => {
   }, [NFTList]);
 
   return (
-    <div style={{height:"100%"}}>
-      <ImageList variant="standard" cols={6} gap={100} style={{ paddingTop:"5%", height:"90%", width:"90vw"}}>
+    <div style={{ height: "100%" }}>
+      <ImageList
+        variant="standard"
+        cols={6}
+        gap={100}
+        style={{ paddingTop: "5%", height: "90%", width: "90vw" }}
+      >
         {musicList.map((item) => (
           // <Link href={item.audioUrl} target="_blank" key={item.title}>
           <ImageListItem
@@ -56,7 +66,12 @@ const MusicCard = ({setMusicURL}) => {
               setMusicURL(item.audioUrl);
             }}
             key={item.title}
-            style={{ width: "10vw", height:"10vw", cursor: "pointer", overflow: "hidden" }}
+            style={{
+              width: "10vw",
+              height: "10vw",
+              cursor: "pointer",
+              overflow: "hidden",
+            }}
           >
             <img
               src={`${item.image}?w=248&h=248&fit=crop&auto=format`}
@@ -67,10 +82,20 @@ const MusicCard = ({setMusicURL}) => {
             />
             <ImageListItemBar
               title={
-                <span style={{ fontSize: "auto", color: "white", fontWeight:"600" }}>{item.title}</span>
+                <span
+                  style={{
+                    fontSize: "auto",
+                    color: "white",
+                    fontWeight: "600",
+                  }}
+                >
+                  {item.title}
+                </span>
               }
               subtitle={
-                <span style={{ color: "white", fontWeight:"600" }}>{item.artist}</span>
+                <span style={{ color: "white", fontWeight: "600" }}>
+                  {item.artist}
+                </span>
               }
             />
           </ImageListItem>
@@ -86,30 +111,30 @@ const MusicCard = ({setMusicURL}) => {
 
 export default MusicCard;
 
-  // const musicList = [
-  //   {
-  //     title: "Song title1",
-  //     url: "album",
-  //     image: "/music-title.svg",
-  //   },
-  //   {
-  //     title: "Song title2",
-  //     url: "",
-  //     image: "/music-title.svg",
-  //   },
-  //   {
-  //     title: "Song title3",
-  //     url: "",
-  //     image: "/music-title.svg",
-  //   },
-  //   {
-  //     title: "Song title4",
-  //     url: "",
-  //     image: "/music-title.svg",
-  //   },
-  //   {
-  //     title: "Song title5",
-  //     url: "",
-  //     image: "/music-title.svg",
-  //   },
-  // ];
+// const musicList = [
+//   {
+//     title: "Song title1",
+//     url: "album",
+//     image: "/music-title.svg",
+//   },
+//   {
+//     title: "Song title2",
+//     url: "",
+//     image: "/music-title.svg",
+//   },
+//   {
+//     title: "Song title3",
+//     url: "",
+//     image: "/music-title.svg",
+//   },
+//   {
+//     title: "Song title4",
+//     url: "",
+//     image: "/music-title.svg",
+//   },
+//   {
+//     title: "Song title5",
+//     url: "",
+//     image: "/music-title.svg",
+//   },
+// ];
