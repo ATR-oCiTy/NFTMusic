@@ -16,12 +16,14 @@ export default function Navbar() {
           </Link>
         </div>
         <div className='nav-icon'>
-          <img
-            src='/search.svg'
-            alt='Picture of the author'
-            width={40}
-            height={40}
-          />
+          <Link href='/nft'>
+            <img
+              src='/search.svg'
+              alt='Picture of the author'
+              width={40}
+              height={40}
+            />
+          </Link>
         </div>
         <div className='nav-icon'>
           <Link href='/user'>
