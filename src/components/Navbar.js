@@ -24,7 +24,7 @@ export default function Navbar() {
           />
         </div>
         <div className='nav-icon'>
-          <Link href='/yourNFT'>
+          <Link href='/user'>
             <img
               src='/profile.svg'
               alt='Picture of the author'

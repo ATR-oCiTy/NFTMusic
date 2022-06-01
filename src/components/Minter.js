@@ -5,7 +5,7 @@ import { Card, Grid } from "@mui/material";
 import { TextField } from "@mui/material";
 import { Button } from "@mui/material";
 import { MoralisContext, MoralisProvider } from "react-moralis";
-import { contractAddress, ABI } from "../ABI_Contract";
+import { contractAddress, ABI } from "../deployedContracts/NFT_ABI_Contract";
 import "../styles/Minter.css";
 const Web3 = require("web3");
 

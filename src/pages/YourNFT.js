@@ -7,9 +7,15 @@ import {
   Button,
 } from "@mui/material";
 import Navbar from "../components/Navbar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import placeholder from "../placeholder.jpg";
+import { useMoralis, useMoralisWeb3Api } from "react-moralis";
+import { contractAddress } from "../deployedContracts/NFT_ABI_Contract";
 const YourNFT = () => {
+  const Web3Api = useMoralisWeb3Api();
+  const [NFTList, setNFTList] = useState([]);
+  const [musicList, setMusicList] = useState([]);
+
   const [YourNFTList, setYourNFTList] = useState([
     {
       image: placeholder,
@@ -22,6 +28,51 @@ const YourNFT = () => {
       artist: "Test Artist",
     },
   ]);
+
+  const {user} = useMoralis();
+
+  const fetchAllUserNFTs = async () => {
+    setNFTList([]);
+    const options = {
+      token_address: contractAddress,
+      chain: "rinkeby",
+      address: user.attributes.ethAddress,
+    };
+    var NFTs = await Web3Api.account.getNFTsForContract(options);
+    console.log(NFTs.result);
+    NFTs.result.forEach((item, index) => {
+      if (item.metadata != null) {
+        setNFTList((NFTList) => [
+          ...NFTList,
+          item,
+        ])
+      }
+    });
+    // setNFTList(NFTs.result);
+    
+  };
+
+  const parseNFTs = async () => {
+    setMusicList([]);
+    NFTList.forEach((item, index) => {
+      if (item.metadata != null) {
+        // console.log(JSON.parse(item.metadata));
+        if (!musicList.includes(JSON.parse(item.metadata))) {
+          setMusicList((musicList) => [
+            ...musicList,
+            JSON.parse(item.metadata),
+          ]);
+        }
+        // console.log(musicList);
+      }
+    });
+  };
+
+  useEffect(() => {
+    // console.log(NFTList);
+    parseNFTs();
+  }, [NFTList]);
+
   return (
     <div className='home-container'>
       <div className='main'>
@@ -37,11 +88,12 @@ const YourNFT = () => {
               gap={100}
               style={{ height: "100%" }}
             >
-              {YourNFTList.map((item) => (
+              {NFTList.map((item) => (
+                // console.log(JSON.parse(item.metadata))
                 // <Link href={item.audioUrl} target="_blank" key={item.title}>
                 <div className='rengu'>
                   <ImageListItem
-                    key={item.title}
+                    key={item.token_id}
                     style={{
                       width: "10vw",
                       height: "10vw",
@@ -50,9 +102,9 @@ const YourNFT = () => {
                     }}
                   >
                     <img
-                      src={item.image}
-                      srcSet={item.image}
-                      alt={item.title}
+                      src={JSON.parse(item.metadata).image}
+                      // srcSet={item.metadata["image"]}
+                      // alt={item.metadata["title"]}
                       loading='lazy'
                       // style={{ width: "10vw", height:"10vw", cursor: "pointer" }}
                     />
@@ -65,12 +117,12 @@ const YourNFT = () => {
                             fontWeight: "600",
                           }}
                         >
-                          {item.title}
+                          {JSON.parse(item.metadata).title}
                         </span>
                       }
                       subtitle={
                         <span style={{ color: "white", fontWeight: "600" }}>
-                          {item.artist}
+                          {JSON.parse(item.metadata).artist}
                         </span>
                       }
                     />
@@ -84,6 +136,9 @@ const YourNFT = () => {
                 </div>
               ))}
             </ImageList>
+          </Grid>
+          <Grid>
+            <Button variant="contained" onClick={fetchAllUserNFTs}>Refresh</Button>
           </Grid>
         </Grid>
       </div>

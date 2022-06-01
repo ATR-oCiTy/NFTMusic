@@ -11,7 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import { useMoralisWeb3Api } from "react-moralis";
 import { MoralisContext, MoralisProvider } from "react-moralis";
-import { contractAddress } from "../ABI_Contract";
+import { contractAddress } from "../deployedContracts/NFT_ABI_Contract";
 import axios from "axios";
 
 const MusicCard = ({ setMusicURL }) => {
