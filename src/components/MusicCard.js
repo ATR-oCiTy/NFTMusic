@@ -11,73 +11,153 @@ import {
 import { useEffect, useState } from "react";
 import { useMoralisWeb3Api } from "react-moralis";
 import { MoralisContext, MoralisProvider } from "react-moralis";
-import { contractAddress } from "../ABI_Contract";
+import { contractAddress } from "../deployedContracts/NFT_ABI_Contract";
+import { marketPlaceABI, marketPlaceContractAddress } from "../deployedContracts/Marketplace_ABI_Contract";
 import axios from "axios";
+const Web3 = require("web3");
 
-const MusicCard = ({setMusicURL}) => {
+
+const MusicCard = ({ setMusicURL }) => {
   const Web3Api = useMoralisWeb3Api();
   var NFTs = [];
   const [NFTList, setNFTList] = useState([]);
   const [musicList, setMusicList] = useState([]);
+  const [listedTokens, setListedTokens] = useState([]);
+  const [listedNFTTokenIds, setlistedNFTTokenIds] = useState([]);
+  const [listedNFTData, setlistedNFTData] = useState([]);
+  const [tokenIds, setTokenIds] = useState([]);
 
-  const fetchAllTokenIds = async () => {
-    const options = {
-      address: contractAddress,
-      chain: "rinkeby",
-    };
-    NFTs = await Web3Api.token.getAllTokenIds(options);
-    setNFTList(NFTs.result);
-  };
-
-  const parseNFTs = async () => {
-    setMusicList([]);
-    NFTList.forEach((item, index) => {
-      if (item.metadata!=null) {
-        console.log(JSON.parse(item.metadata, ));
-        setMusicList(musicList => [...musicList, JSON.parse(item.metadata)]);
-        console.log(musicList);
+  const getAllListedNFTs = async () => {
+    var i=1;
+    setlistedNFTTokenIds([])
+    const w3 = new Web3(window.ethereum);
+    const marketPlaceContract = new w3.eth.Contract(marketPlaceABI, marketPlaceContractAddress);
+    while(true){
+      var reciept = await marketPlaceContract.methods.marketItems(
+        i
+      ).call()
+      if(reciept.id==0){
+        break;
       }
-    });
-  };
+      i+=1
+      
+      console.log(reciept)
+      if(reciept.state!="2"){
+      setlistedNFTTokenIds((listedNFTTokenIds) => [
+        ...listedNFTTokenIds,
+        reciept.tokenId
+      ])
+    }
+      console.log(listedNFTTokenIds)
+    }
+    setTokenIds(listedNFTTokenIds)
+  }
+
+  const getNFTData = async () => {
+    setlistedNFTData([])
+    tokenIds.forEach(async (item, index) => {
+      const options = {
+        address: contractAddress,
+        token_id: item,
+        chain: "rinkeby",
+      };
+      const tokenMetadata = await Web3Api.token.getTokenIdMetadata(options);
+      setlistedNFTData((listedNFTData) => [
+        ...listedNFTData,
+        tokenMetadata
+      ])
+    })
+    console.log(listedNFTData)
+  }
+
+  // const fetchAllTokenIds = async () => {
+  //   const options = {
+  //     address: contractAddress,
+  //     chain: "rinkeby",
+  //   };
+  //   NFTs = await Web3Api.token.getAllTokenIds(options);
+  //   setNFTList(NFTs.result);
+  // };
+
+  // const parseNFTs = async () => {
+  //   setMusicList([]);
+  //   NFTList.forEach((item, index) => {
+  //     if (item.metadata != null) {
+  //       console.log(JSON.parse(item.metadata));
+  //       if (!musicList.includes(JSON.parse(item.metadata))) {
+  //         setMusicList((musicList) => [
+  //           ...musicList,
+  //           JSON.parse(item.metadata),
+  //         ]);
+  //       }
+  //       // console.log(musicList);
+  //     }
+  //   });
+  // };
+
+  // useEffect(() => {
+  //   console.log(NFTList);
+  //   parseNFTs();
+  // }, [NFTList]);
 
   useEffect(() => {
-    console.log(NFTList);
-    parseNFTs();
-  }, [NFTList]);
+    console.log(listedNFTTokenIds);
+    getNFTData();
+  }, [tokenIds])
 
   return (
-    <div style={{height:"100%"}}>
-      <ImageList variant="standard" cols={7} gap={100} style={{height:"100%"}}>
-        {musicList.map((item) => (
+    <div style={{ height: "100%" }}>
+      <ImageList
+        variant="standard"
+        cols={6}
+        gap={100}
+        style={{ paddingTop: "5%", height: "90%", width: "90vw" }}
+      >
+        {listedNFTData.map((item) => (
           // <Link href={item.audioUrl} target="_blank" key={item.title}>
           <ImageListItem
             onClick={() => {
               console.log("clicked");
-              setMusicURL(item.audioUrl);
+              setMusicURL(JSON.parse(item.metadata).audioUrl);
             }}
             key={item.title}
-            style={{ width: "10vw", height:"10vw", cursor: "pointer", overflow: "hidden" }}
+            style={{
+              width: "10vw",
+              height: "10vw",
+              cursor: "pointer",
+              overflow: "hidden",
+            }}
           >
             <img
-              src={`${item.image}?w=248&h=248&fit=crop&auto=format`}
-              srcSet={`${item.image}?w=248&h=248&fit=crop&auto=format&dpr=2 2x`}
-              alt={item.title}
+              src={`${JSON.parse(item.metadata).image}?w=248&h=248&fit=crop&auto=format`}
+              srcSet={`${JSON.parse(item.metadata).image}?w=248&h=248&fit=crop&auto=format&dpr=2 2x`}
+              alt={JSON.parse(item.metadata).title}
               loading="lazy"
               // style={{ width: "10vw", height:"10vw", cursor: "pointer" }}
             />
             <ImageListItemBar
               title={
-                <span style={{ fontSize: "auto", color: "white", fontWeight:"600" }}>{item.title}</span>
+                <span
+                  style={{
+                    fontSize: "auto",
+                    color: "white",
+                    fontWeight: "600",
+                  }}
+                >
+                  {JSON.parse(item.metadata).title}
+                </span>
               }
               subtitle={
-                <span style={{ color: "white", fontWeight:"600" }}>{item.artist}</span>
+                <span style={{ color: "white", fontWeight: "600" }}>
+                  {JSON.parse(item.metadata).artist}
+                </span>
               }
             />
           </ImageListItem>
           // </Link>
         ))}
       </ImageList>
-      <Button variant="contained" onClick={fetchAllTokenIds}>
+      <Button variant="contained" onClick={() => {getAllListedNFTs()}}>
         Refresh
       </Button>
     </div>
@@ -85,31 +165,3 @@ const MusicCard = ({setMusicURL}) => {
 };
 
 export default MusicCard;
-
-  // const musicList = [
-  //   {
-  //     title: "Song title1",
-  //     url: "album",
-  //     image: "/music-title.svg",
-  //   },
-  //   {
-  //     title: "Song title2",
-  //     url: "",
-  //     image: "/music-title.svg",
-  //   },
-  //   {
-  //     title: "Song title3",
-  //     url: "",
-  //     image: "/music-title.svg",
-  //   },
-  //   {
-  //     title: "Song title4",
-  //     url: "",
-  //     image: "/music-title.svg",
-  //   },
-  //   {
-  //     title: "Song title5",
-  //     url: "",
-  //     image: "/music-title.svg",
-  //   },
-  // ];
