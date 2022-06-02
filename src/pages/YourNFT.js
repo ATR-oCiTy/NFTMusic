@@ -202,7 +202,7 @@ const YourNFT = () => {
                     </ImageListItem>
                     <div className='button-block'>
                       <div>
-                        <Button variant='contained'>Info</Button>
+                        <Button variant='contained' href={"/nft/"+ item.token_id}>Info</Button>
                         <Button variant="contained" onClick={() => {
                           checkIfListed(item.token_id)?unlistNFT(item):listNFT(item)
                         }}>{checkIfListed(item.token_id)?"Unlist":"List"}</Button>

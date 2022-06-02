@@ -40,29 +40,27 @@ const rows = [
   createData("Gingerbread", 356, 16.0, 49, 3.9),
 ];
 
-export default function EtherTable() {
+export default function EtherTable({transferData}) {
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 700 }} aria-label='customized table'>
         <TableHead>
           <TableRow>
-            <StyledTableCell>Dessert (100g serving)</StyledTableCell>
-            <StyledTableCell align='right'>Calories</StyledTableCell>
-            <StyledTableCell align='right'>Fat&nbsp;(g)</StyledTableCell>
-            <StyledTableCell align='right'>Carbs&nbsp;(g)</StyledTableCell>
-            <StyledTableCell align='right'>Protein&nbsp;(g)</StyledTableCell>
+            <StyledTableCell>Block Number</StyledTableCell>
+            <StyledTableCell align='right'>Timestamp</StyledTableCell>
+            <StyledTableCell align='right'>From</StyledTableCell>
+            <StyledTableCell align='right'>To</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
-            <StyledTableRow key={row.name}>
+          {transferData.map((transfer) => (
+            <StyledTableRow key={transfer.block_number}>
               <StyledTableCell component='th' scope='row'>
-                {row.name}
+                {transfer.block_number}
               </StyledTableCell>
-              <StyledTableCell align='right'>{row.calories}</StyledTableCell>
-              <StyledTableCell align='right'>{row.fat}</StyledTableCell>
-              <StyledTableCell align='right'>{row.carbs}</StyledTableCell>
-              <StyledTableCell align='right'>{row.protein}</StyledTableCell>
+              <StyledTableCell align='right'>{transfer.block_timestamp}</StyledTableCell>
+              <StyledTableCell align='right'>{transfer.from_address=="0x0000000000000000000000000000000000000000"?"Minter":transfer.from_address}</StyledTableCell>
+              <StyledTableCell align='right'>{transfer.to_address}</StyledTableCell>
             </StyledTableRow>
           ))}
         </TableBody>

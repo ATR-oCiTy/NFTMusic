@@ -15,7 +15,7 @@ export default function Navbar() {
             />
           </Link>
         </div>
-        <div className='nav-icon'>
+        {/* <div className='nav-icon'>
           <Link href='/nft'>
             <img
               src='/search.svg'
@@ -24,7 +24,7 @@ export default function Navbar() {
               height={40}
             />
           </Link>
-        </div>
+        </div> */}
         <div className='nav-icon'>
           <Link href='/user'>
             <img

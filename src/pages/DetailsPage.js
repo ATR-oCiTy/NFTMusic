@@ -10,47 +10,77 @@ import "../styles/DetailsPage.css"
 import { contractAddress } from "../deployedContracts/NFT_ABI_Contract";
 import { useMoralisWeb3Api } from "react-moralis";
 import { useParams } from "react-router-dom";
-
+import { Button } from "@mui/material";
 
 const DetailsPage = (props) => {
   const Web3Api = useMoralisWeb3Api();
-  let {tokenId} = useParams();
+  let { tokenId } = useParams();
 
-  const [listedNFTData, setlistedNFTData] = useState();
+  const [NFTData, setNFTData] = useState(
+    {
+      artist: "XXX",
+      audioUrl: "XXX",
+      // image: "XXX",
+      name: "XXX",
+      title: "XXX",
+      version: "XXX"
+    });
+
+  const [transferData, setTransferData] = useState(
+    [
+
+      {
+        amount: "0",
+        block_hash: "0",
+        block_number: "0",
+        block_timestamp: "2022-04-29T04:02:34.000Z",
+        contract_type: "ERC721",
+        from_address: "0x0000000000000000000000000000000000000000",
+        log_index: 0,
+        operator: null,
+        to_address: "0",
+        token_address: "0",
+        token_id: "0",
+        transaction_hash: "0",
+        transaction_index: 0,
+        transaction_type: "0",
+        value: "0",
+        verified: 1,
+      }
+    ]
+  )
+
+  const [tokenOwner, setTokenOwner] = useState("XXX");
   const [transferList, setTransferList] = useState();
 
   const getNFTDetails = async () => {
-    setlistedNFTData([])
     const options = {
       address: contractAddress,
       token_id: tokenId,
       chain: "rinkeby",
     };
-    const tokenMetadata = await Web3Api.token.getTokenIdMetadata(options);
-    setlistedNFTData((listedNFTData) => [
-      ...listedNFTData,
-      tokenMetadata
-    ])
-    console.log(listedNFTData)
+    var tokenMetadata = await Web3Api.token.getTokenIdMetadata(options);
+    console.log(tokenMetadata)
+    console.log(tokenMetadata.metadata)
+    setNFTData(JSON.parse(tokenMetadata.metadata));
+    setTokenOwner(tokenMetadata.owner_of)
+    console.log(NFTData.image)
+    // console.log(listedNFTData)
   }
 
   const getNFTTransfers = async () => {
+    setTransferList([]);
     const options = {
       address: contractAddress,
       token_id: tokenId,
       chain: "rinkeby",
     };
-    const transfers = await Web3Api.token.getWalletTokenIdTransfers(
+    var transfers = await Web3Api.token.getWalletTokenIdTransfers(
       options
     );
-    setTransferList(transferList)
-    console.log(transferList)
+    console.log(transfers)
+    setTransferData(transfers.result);
   }
-
-  useState(()=> {
-    getNFTDetails();
-    getNFTTransfers();
-  },[])
 
   return (
     <Grid container className='mint-main' spacing={2}>
@@ -63,20 +93,25 @@ const DetailsPage = (props) => {
         style={{ margin: "20px", height: "80vh", width: "90%" }}
       >
         <Grid item xs={5}>
-          <img src={TestImage} style={{ height: "65vh" }} />
+          <img src={NFTData.image} alt={TestImage} style={{ height: "65vh" }} />
         </Grid>
         <Grid item xs={7} style={{ height: "24vh" }}>
-          <h1>Test NFT Name</h1>
-          <Grid item xs={7}>
-            <h4>Owned by : </h4>
-          </Grid>
+          <h1>{NFTData.title}</h1>
           <Grid item xs={12}>
-            <h2>Top bid : </h2>
+            <h2>Artist/Album : {NFTData.artist}</h2>
           </Grid>
+          <Grid item xs={7}>
+            <h4>Owned by : {tokenOwner}</h4>
+          </Grid>
+
         </Grid>
         <Grid item xs={12} margin={2}>
-          <EtherTable />
+          <EtherTable transferData={transferData} />
         </Grid>
+        <Button variant="contained" onClick={() => {
+          getNFTDetails();
+          getNFTTransfers();
+        }}>Refresh</Button>
       </Grid>
     </Grid>
   );
