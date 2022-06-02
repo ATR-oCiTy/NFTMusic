@@ -1,12 +1,57 @@
 import React from "react";
+import { useState } from "react";
 import { Grid } from "@mui/material";
 import Navbar from "../components/Navbar";
 import "../styles/DetailsPage.css";
 
 import TestImage from "../placeholder.jpg";
 import EtherTable from "../components/EtherTable";
+import "../styles/DetailsPage.css"
+import { contractAddress } from "../deployedContracts/NFT_ABI_Contract";
+import { useMoralisWeb3Api } from "react-moralis";
+import { useParams } from "react-router-dom";
 
-const DetailsPage = ({ user }) => {
+
+const DetailsPage = (props) => {
+  const Web3Api = useMoralisWeb3Api();
+  let {tokenId} = useParams();
+
+  const [listedNFTData, setlistedNFTData] = useState();
+  const [transferList, setTransferList] = useState();
+
+  const getNFTDetails = async () => {
+    setlistedNFTData([])
+    const options = {
+      address: contractAddress,
+      token_id: tokenId,
+      chain: "rinkeby",
+    };
+    const tokenMetadata = await Web3Api.token.getTokenIdMetadata(options);
+    setlistedNFTData((listedNFTData) => [
+      ...listedNFTData,
+      tokenMetadata
+    ])
+    console.log(listedNFTData)
+  }
+
+  const getNFTTransfers = async () => {
+    const options = {
+      address: contractAddress,
+      token_id: tokenId,
+      chain: "rinkeby",
+    };
+    const transfers = await Web3Api.token.getWalletTokenIdTransfers(
+      options
+    );
+    setTransferList(transferList)
+    console.log(transferList)
+  }
+
+  useState(()=> {
+    getNFTDetails();
+    getNFTTransfers();
+  },[])
+
   return (
     <Grid container className='mint-main' spacing={2}>
       <Grid item lg={1}>

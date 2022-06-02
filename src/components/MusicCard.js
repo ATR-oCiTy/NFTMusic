@@ -20,9 +20,9 @@ const Web3 = require("web3");
 const MusicCard = ({ setMusicURL }) => {
   const Web3Api = useMoralisWeb3Api();
   var NFTs = [];
-  const [NFTList, setNFTList] = useState([]);
-  const [musicList, setMusicList] = useState([]);
-  const [listedTokens, setListedTokens] = useState([]);
+  // const [NFTList, setNFTList] = useState([]);
+  // const [musicList, setMusicList] = useState([]);
+  // const [listedTokens, setListedTokens] = useState([]);
   const [listedNFTTokenIds, setlistedNFTTokenIds] = useState([]);
   const [listedNFTData, setlistedNFTData] = useState([]);
   const [tokenIds, setTokenIds] = useState([]);

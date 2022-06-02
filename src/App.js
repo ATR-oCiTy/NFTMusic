@@ -37,10 +37,10 @@ function App() {
   };
 
   return (
-    <div className='App'style={{height: "100vh", width: "100vw"}}>
+    <div className='App'style={{height: "100vh", width: "100vw", overflow:"auto"}}>
       <Card>
-        <Button onClick={login}>Moralis Metamask Login</Button>
-        <Button onClick={logOut} disabled={isAuthenticating}>
+        <Button variant="contained" color="success" onClick={login}>Moralis Metamask Login</Button>
+        <Button variant="contained" color="error" onClick={logOut} disabled={isAuthenticating}>
           Logout
         </Button>
       </Card>
@@ -49,7 +49,7 @@ function App() {
           <Routes>
             <Route path='/' element={<Home />}></Route>
             <Route path='/mint' element={<MintPage user={user} />}></Route>
-            <Route path='/nft' element={<DetailsPage />}></Route>
+            <Route path='/nft/:tokenId' element={<DetailsPage />}></Route>
             <Route path='/user' element={<YourNFT />}></Route>
           </Routes>
         </BrowserRouter>
