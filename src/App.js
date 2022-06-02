@@ -37,7 +37,7 @@ function App() {
   };
 
   return (
-    <div className='App'>
+    <div className='App'style={{height: "100vh", width: "100vw"}}>
       <Card>
         <Button onClick={login}>Moralis Metamask Login</Button>
         <Button onClick={logOut} disabled={isAuthenticating}>
