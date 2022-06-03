@@ -23,7 +23,7 @@ const Home = () => {
           rowSpacing={0}
         >
           <Grid item xs={12}  className="greeting">
-            <h1 style={{color:"white"}}> Welcome back, Ashley! </h1>
+            <h1 style={{color:"white"}}> Welcome back! </h1>
           </Grid>
           <Grid item xs={12}>
             <MusicCard setMusicURL={setMusicURL} />
