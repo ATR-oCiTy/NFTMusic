@@ -1,0 +1,141 @@
+name: ReactJS CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: "your_aws_region" # e.g., us-east-1
+  ECR_REPOSITORY: "your_ecr_repo_name" # e.g., nftmusic-repo
+  ECS_CLUSTER_NONLIVE: "nonlive-cluster"
+  ECS_SERVICE_NONLIVE: "nftmusic-nonlive-service"
+  ECS_CLUSTER_LIVE: "live-cluster"
+  ECS_SERVICE_LIVE: "nftmusic-live-service"
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16 # or your preferred version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16 # or your preferred version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Generate coverage report
+        run: npm run coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }} # Optional: if using Codecov
+
+  build:
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16 # or your preferred version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production build
+        run: npm run build
+
+      - name: Build Docker image
+        run: |
+          docker build -t $ECR_REPOSITORY:latest .
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Push image to ECR
+        run: |
+          docker tag $ECR_REPOSITORY:latest $ECR_REPOSITORY:$GITHUB_SHA
+          docker push $ECR_REPOSITORY:latest
+          docker push $ECR_REPOSITORY:$GITHUB_SHA
+          echo "IMAGE_TAG=$GITHUB_SHA" >> $GITHUB_ENV
+
+  deploy-nonlive:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update ECS task definition
+        run: |
+          TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition $ECS_SERVICE_NONLIVE --region ${{ env.AWS_REGION }} | jq '.taskDefinition')
+          NEW_TASK_DEFINITION=$(echo "$TASK_DEFINITION" | jq '.containerDefinitions[0].image = env.ECR_REPOSITORY + ":" + env.IMAGE_TAG')
+          aws ecs register-task-definition --family $ECS_SERVICE_NONLIVE --container-definitions "$NEW_TASK_DEFINITION" --region ${{ env.AWS_REGION }}
+
+      - name: Deploy to ECS nonlive
+        run: |
+          aws ecs update-service --cluster $ECS_CLUSTER_NONLIVE --service $ECS_SERVICE_NONLIVE --force-new-deployment --region ${{ env.AWS_REGION }}
+
+  deploy-live:
+    needs: [deploy-nonlive]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update ECS task definition
+        run: |
+          TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition $ECS_SERVICE_LIVE --region ${{ env.AWS_REGION }} | jq '.taskDefinition')
+          NEW_TASK_DEFINITION=$(echo "$TASK_DEFINITION" | jq '.containerDefinitions[0].image = env.ECR_REPOSITORY + ":" + env.IMAGE_TAG')
+          aws ecs register-task-definition --family $ECS_SERVICE_LIVE --container-definitions "$NEW_TASK_DEFINITION" --region ${{ env.AWS_REGION }}
+
+      - name: Deploy to ECS live
+        run: |
+          aws ecs update-service --cluster $ECS_CLUSTER_LIVE --service $ECS_SERVICE_LIVE --force-new-deployment --region ${{ env.AWS_REGION }}
