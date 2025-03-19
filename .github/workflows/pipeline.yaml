@@ -1,0 +1,121 @@
+name: Python Django with GCP Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8
+
+      - name: Lint with flake8
+        run: flake8 .
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install coverage
+
+      - name: Run tests with coverage
+        run: |
+          coverage run manage.py test
+          coverage xml
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          fail_ci_if_error: true
+
+
+  build:
+    needs: [format, test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build Docker image
+        run: docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/nftmusic:latest .
+
+      - name: Configure gcloud CLI
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Authenticate Docker with Google Container Registry
+        run: gcloud auth configure-docker
+
+      - name: Push image to Google Container Registry
+        run: docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/nftmusic:latest
+
+  deploy-nonlive:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Configure gcloud CLI
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Deploy to Google Cloud Run (Non-Live)
+        run: |
+          gcloud run deploy nftmusic-nonlive \
+            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/nftmusic:latest \
+            --platform managed \
+            --region us-central1 \
+            --memory 1Gi \
+            --concurrency 80 \
+            --max-instances 3
+
+  deploy-live:
+    needs: [deploy-nonlive]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Configure gcloud CLI
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Deploy to Google Cloud Run (Live)
+        run: |
+          gcloud run deploy nftmusic-live \
+            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/nftmusic:latest \
+            --platform managed \
+            --region us-central1 \
+            --memory 1Gi \
+            --concurrency 80 \
+            --max-instances 10
